@@ -1,0 +1,14 @@
+<h1>Lists#show</h1>
+<p><%= @list.name %></p>
+<ol>
+<% @list.bookmarks.each do |book| %>
+  <li><%= book.comment %>
+      <%= link_to "X",
+                bookmark_path(book),
+                data: {
+                  turbo_method: :delete,
+                  turbo_confirm: 'Oui vraiment?'
+                } %></li>
+<% end %>
+</ol>
+<%= link_to "New bookmark", new_list_bookmark_path(@list)%>
