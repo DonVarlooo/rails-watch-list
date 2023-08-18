@@ -1,24 +1,37 @@
 class BookmarksController < ApplicationController
+  before_action :set_bookmark, only: :destroy
+  before_action :set_list, only: %i[new create]
+
   def new
-    @list = List.find(params[:list_id])
     @bookmark = Bookmark.new
   end
 
   def create
-    @list = List.find(params[:list_id])
-    @movie = Movie.find(params[:bookmark][:movie_id])
-    @bookmark = Bookmark.new(comment: params[:bookmark][:comment])
-    @bookmark.movie_id = @movie.id
-    @bookmark.list_id = @list.id
-    if @bookmark.save # si il save bien, il renvoie l'instance, sinon renvoie false
+    @bookmark = Bookmark.new(bookmark_params)
+    @bookmark.list = @list
+    if @bookmark.save
       redirect_to list_path(@list)
     else
-      render :new, status: :unprocessable_entity
+      render :new
     end
   end
 
   def destroy
-    @bookmark = Bookmark.find(params[:id])
     @bookmark.destroy
+    redirect_to list_path(@bookmark.list), status: :see_other
+  end
+
+  private
+
+  def bookmark_params
+    params.require(:bookmark).permit(:comment, :movie_id)
+  end
+
+  def set_bookmark
+    @bookmark = Bookmark.find(params[:id])
+  end
+
+  def set_list
+    @list = List.find(params[:list_id])
   end
 end
